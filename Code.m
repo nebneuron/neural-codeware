@@ -37,6 +37,8 @@ classdef Code < handle
         end
         
         function gph = Graph(this)
+            % The neuron cofire graph: a vertex for each codeword index,
+            % edges joining indices that appear in some codeword together.
             mtxWords = this.Words.ToMatrix();
             
             gph = Graph(mtxWords' * mtxWords);
@@ -95,16 +97,19 @@ classdef Code < handle
         
         function codeNew = Shuffle(this)
             mtxOld = this.Words.ToMatrix();
-            mtxNew = zeros(this.Words.Size, this);
-            n = this.Words.Dimension;
+            
+            iSize = this.Words.Size;
+            iLength = this.Words.Dimension;
+            
+            mtxNew = zeros(iSize, iLength);
             
             for ii = (1 : this.Words.Size)
                 bFoundNewWord = false;
                 
                 while ~bFoundNewWord
-                    rvNewWord = mtxOld(ii, randperm(n));
+                    rvNewWord = mtxOld(ii, randperm(iLength));
                     
-                    if ~isempty(setdiff(rvNewWord, mtxNew(1 : ii - 1, :)))
+                    if ~isempty(setdiff(rvNewWord, mtxNew(1 : ii - 1, :), 'rows'))
                         mtxNew(ii, :) = rvNewWord;
                         bFoundNewWord = true;
                     end
@@ -174,10 +179,11 @@ classdef Code < handle
         end
         
         function obj = RandomConstantWeight(iLength, iNumWords, iWeight)
+            % obj = Code.RandomConstantWeight(iLength, iNumWords, iWeight)
             assert(nchoosek(iLength, iWeight) >= iNumWords, ...
                 ['The number of possible codewords of length ' num2str(iLength) ...
                  ' and weight ' num2str(iWeight) ' is less than the number of desired' ...
-                 ' codewords (' num2str(iWords) ').  Please choose new parameters.']);
+                 ' codewords (' num2str(iNumWords) ').  Please choose new parameters.']);
 
             [~, perm] = sort(rand(iNumWords, iLength), 2);
             indices = perm(:, 1:iWeight);
@@ -198,7 +204,7 @@ classdef Code < handle
             end
 
             mtxCode = mtxCode(1:iNumWords, :);
-
+            obj = Code(mtxCode);
         end
         
         function obj = ShiftCode(n, k)
