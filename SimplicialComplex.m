@@ -24,20 +24,8 @@ classdef SimplicialComplex < handle
         % needed, at which point a generating method will be called.  This will be
         % stored as a sparse matrix.
         Facets;
-    end
-    
-    % These properties are dependent, meaning that their values are not stored
-    % but are rather recomputed each time they are accessed.  Hence, each of
-    % these properties needs to have a corresponding `get.<property>` method
-    % (but no `set` method).
-    properties (Dependent = true, SetAccess = private)
-        % This is more of a note that this can be done.  Should any properties be
-        % like this?  Perhaps properties for retrieving simplices in different
-        % formats?  Perhaps not: That might be better suited to a more generic
-        % function for retrieval of all the different formats.
         
-        % The number of vertices in this complex.
-        NumVerts;
+        Weights;
     end
     
     properties (Dependent = true, Access = protected)
@@ -56,29 +44,29 @@ classdef SimplicialComplex < handle
     end
     
     methods (Access = public)
-        function this = SimplicialComplex(objGenerators, bIsFullComplex)
+        function this = SimplicialComplex(cllnGenerators, bIsFullComplex)
             %------------------------------------------------------------
             % Usage:
             %    obj = SimplicialComplex(setGenerators)
             % Description:
             %    Constructs a `SimplicialComplex` object.
             % Arguments:
-            %    objGenerators
+            %    cllnGenerators
             %       A nonempty `Collection` object.
             %    bIsFullComplex
             %       A boolean (`true` or `false`) value indicating
             %------------------------------------------------------------
             
-            % Ensure that `objGenerators` is a collection object.
-            if ~isequal(class(objGenerators), 'Collection')
-                objGenerators = Collection(objGenerators);
+            % Ensure that `cllnGenerators` is a collection object.
+            if ~isequal(class(cllnGenerators), 'Collection')
+                cllnGenerators = Collection(cllnGenerators);
             end
             
             % Ensure that the set of generators is nonempty.
-            assert(objGenerators.Size > 0, ...
+            assert(cllnGenerators.Size > 0, ...
                 'The argument must be a nonempty `Collection`.');
             
-            this.Generators = objGenerators;
+            this.Generators = cllnGenerators;
             
             if (nargin == 2)
                 if (bIsFullComplex)
@@ -93,21 +81,40 @@ classdef SimplicialComplex < handle
             end
         end
         
-        function fvect = CountFaces(this, iDimension)
-            % NOT YET IMPLEMENTED
-            % 
+        function cvWeights = GetWeights(this)
+            cvWeights = this.Weights;
+        end
+        
+        function SetWeights(this, cvWeights)
+            assert(this.FacesAreGenerated);
+            assert(iscolumn(cvWeights));
+            assert(isnumeric(cvWeights));
+            assert(this.Faces.Size == length(cvWeights));
+            
+            this.Weights = cvWeights;
+        end
+        
+        function i = NumFaces(this)
+            cllnFaces = GetFaces(this);
+            i = cllnFaces.Size;
+        end
+        
+        function iNum = NumVerts(this)
+            iNum = Dimension(this.Generators);
+        end
+        
+        function fvect = FVector(this)
             %------------------------------------------------------------
             % Usage:
-            %    iNumFaces = obj.CountFaces(iDimension)
+            %    fvect = obj.FVector()
             % Description:
-            %    Count the number of faces in the calling object that are of the given
-            %    dimension.
-            % Arguments:
-            %    iDimension
-            %       The dimension of the faces to count.
+            %    Compute and return the f-vector of this simplicial complex
+            %    (except the zeroth entry).  Specifically, `fvect(i)` is the
+            %    number of faces of dimension `i` in this complex.
             %------------------------------------------------------------
             
-            fvect = histc(sum(this.GetFaces().ToMatrix(), 2), 1 : this.NumVerts);
+            fvect = histc(sum(this.GetFaces().ToMatrix(), 2), ...
+                          1 : this.NumVerts);
         end
     end
     
@@ -165,10 +172,6 @@ classdef SimplicialComplex < handle
 %             % generated.
 %             this.FacetsAreGenerated = true;
 %         end
-        
-        function iNum = get.NumVerts(this)
-            iNum = this.Generators.Dimension;
-        end
     end
     
     methods (Access = private)
@@ -214,10 +217,10 @@ classdef SimplicialComplex < handle
             objFacets = this.Facets;
         end
         
-        function mtxFaces = GetFaces(this)
+        function cllnFaces = GetFaces(this)
             %------------------------------------------------------------
             % Usage:
-            %    objFaces = obj.GetFaces()
+            %    cllnFaces = obj.GetFaces()
             % Description:
             %    Return the `Collection` of faces of the calling complex.  Generate the
             %    faces if they have not already been computed.
@@ -227,38 +230,38 @@ classdef SimplicialComplex < handle
                 this.GenerateFaces();
             end
             
-            mtxFaces = this.Faces;
+            cllnFaces = this.Faces;
         end
         
-        function objGenerators = GetGenerators(this)
+        function cllnGenerators = GetGenerators(this)
             %------------------------------------------------------------
             % Usage:
-            %    objGenerators = obj.GetGenerators()
+            %    cllnGenerators = obj.GetGenerators()
             % Description:
             %    Retrieve the generating set of the given object.
             % Return values:
-            %    objGenerators
+            %    cllnGenerators
             %       A `Collection` containing the generators of the calling object.
             %------------------------------------------------------------
             
             % Just return the stored generating set.
-            objGenerators = this.Generators;
+            cllnGenerators = this.Generators;
         end
         
-        function objGraph = Graph(this)
+        function gphOut = Graph(this)
             %------------------------------------------------------------
             % Usage:
-            %    objGraph = obj.Graph()
+            %    gphOut = obj.Graph()
             % Description:
             %    Retrieve the underlying graph of this simplicial complex.
             % Return values:
-            %    objGenerators
+            %    gphOut
             %       A `Graph` whose edges correspond to the 1-faces of the calling
             %       complex.  (This is just the 1-skeleton as a `Graph`.)
             %------------------------------------------------------------
             
             mtxFacets = this.GetFacets().ToMatrix();
-            objGraph = Graph(mtxFacets' * mtxFacets > 0);
+            gphOut = Graph(mtxFacets' * mtxFacets > 0);
         end
         
         function objSkeleton = Skeleton(this, iDimension)
@@ -283,6 +286,45 @@ classdef SimplicialComplex < handle
             %    1-skeleton by using matrix multiplication (something like
             %    `this.GetFacets()' * this.GetFacets()` to get an adjacency matrix).
             %------------------------------------------------------------
+            
+            if (iDimension == 1 && ~this.FacesAreGenerated)
+                % I'm sure this could be cleaned up.  We're just testing...
+                mtxAdj = this.Graph().AdjacencyMatrix;
+                mtxGens = zeros(nnz(mtxAdj) / 2, this.NumVerts);
+                
+                % This should be explained well in the process of cleaning this up.  Also,
+                % if this can be 'vectorized', then it should be; but I couldn't get it to
+                % work in the time that I spent on it.
+                [I, J] = find(triu(mtxAdj));
+                
+                for ii = (1 : length(I))
+                    mtxGens(ii, [I(ii), J(ii)]) = 1;
+                end
+                
+                % The method above will not pick up vertices that are maximal faces (since
+                % these vertices are not adjacent to anybody in the corresponding graph).
+                % Add these vertices (in fact, all vertices) to the list of generators
+                % here.
+                mtxGens = [mtxGens; diag(any(this.Generators.ToMatrix(), 1))];
+                
+                objSkeleton = SimplicialComplex(Collection(mtxGens));
+            else
+                cvFaceDimensions = sum(this.GetFaces().ToMatrix(), 2) - 1;
+                objFaces = this.GetFaces();
+                objSkeleton = SimplicialComplex(objFaces(cvFaceDimensions <= iDimension));
+            end
+        end
+        
+        function objSkeleton = Skeleton2(this, iDimension)
+            % This is a different algorithm for constructing skeletons.  Should we
+            % choose this algorithm over the other, the help-doc for the other function
+            % can be placed here verbatim (after the `2` is removed from this
+            % function's name, of course).  Both algorithms remain for the moment for
+            % testing purposes.
+            % 
+            % This algorithm seems to be faster on the first call, and the other
+            % algorithm seems to be faster on subsequent calls (regardless of the
+            % dimension used in either call).  More testing should probably be done.
             
             % This matrix will hold the generators for the skeleton being constructed.
             % NOTE: Counting the number of generators for the skeleton and
@@ -315,47 +357,6 @@ classdef SimplicialComplex < handle
             objSkeleton = SimplicialComplex(Collection(unique(mtxNewGens, 'rows')));
         end
         
-        function objSkeleton = Skeleton2(this, iDimension)
-            % This is a different algorithm for constructing skeletons.  Should we
-            % choose this algorithm over the other, the help-doc for the other function
-            % can be placed here verbatim (after the `2` is removed from this
-            % function's name, of course).  Both algorithms remain for the moment for
-            % testing purposes.
-            % 
-            % The other algorithm seems to be faster on the first call, and this
-            % algorithm seems to be faster on subsequent calls (regardless of the
-            % dimension used in either call).  Additionally, the algorithm used here
-            % for 1-skeletons may be slower on subsequent calls than the algorithm used
-            % for all other dimensions.  More testing should probably be done.
-            
-            if (iDimension == 1)
-                % I'm sure this could be cleaned up.  We're just testing...
-                mtxAdj = this.Graph().AdjacencyMatrix;
-                mtxGens = zeros(nnz(mtxAdj) / 2, this.NumVerts);
-                
-                % This should be explained well in the process of cleaning this up.  Also,
-                % if this can be 'vectorized', then it should be; but I couldn't get it to
-                % work in the time that I spent on it.
-                [I, J] = find(triu(mtxAdj));
-                
-                for ii = (1 : length(I))
-                    mtxGens(ii, [I(ii), J(ii)]) = 1;
-                end
-                
-                % The method above will not pick up vertices that are maximal faces (since
-                % these vertices are not adjacent to anybody in the corresponding graph).
-                % Add these vertices (in fact, all vertices) to the list of generators
-                % here.
-                mtxGens = [mtxGens; diag(any(this.Generators.ToMatrix(), 1))];
-                
-                objSkeleton = SimplicialComplex(Collection(mtxGens));
-            else
-                cvFaceDimensions = sum(this.GetFaces().ToMatrix(), 2) - 1;
-                objFaces = this.GetFaces();
-                objSkeleton = SimplicialComplex(objFaces(cvFaceDimensions <= iDimension));
-            end
-        end
-        
         function objCompletion = HellyCompletion(this, iDimension, iMaxFaceDim)
             %------------------------------------------------------------
             % Usage:
@@ -369,27 +370,17 @@ classdef SimplicialComplex < handle
             %    iMaxFaceDim
             %       The maximum dimension of the faces to be included in the completion
             %       to be returned.
-            % Note:
-            %    This algorithm requires the Cliquer package.
             % To-do:
             %    Do input checking/parsing.
             %------------------------------------------------------------
             
-            % For now, we have three cases:
-            %    (1) If `iDimension` is `1`, then we should just return the clique
-            %        complex.
-            %    (2) If `iDimension` is `2`, then we should compute the clique complex
-            %        and prune it down based on empty 2-faces.
-            %    (3) Otherwise, we should just error.
-            
-            % % There is currently no algorithm implemented for dimensions other than 1
-            % % and 2.
-            % assert(iDimension == 1 || iDimension == 2, ...
-            %     'The function `SimplicialComplex.HellyCompletion` currently only works for dimensions 1 and 2.');
+            if nargin < 3
+                iMaxFaceDim = this.NumVerts - 1;
+            end
             
             % Initialize the Helly completion to be the clique complex (which is a
             % super-complex of the Helly completion).
-            objCompletion = this.Graph().CliqueComplex(iMaxFaceDim + 1);
+            objCompletion = CliqueComplex(Graph(this), iMaxFaceDim + 1);
             
             % If `iDimension` is `1`, then we are done; otherwise, we must do some
             % pruning.
@@ -407,7 +398,7 @@ classdef SimplicialComplex < handle
                 mtxCompletionFaces = objCompletion.GetFaces().ToMatrix();
                 mtxSkeletonFaces = objSkeleton.GetFaces().ToMatrix();
                 
-                % Remove all faces of dimension different from `iDimension`.
+                % Remove all faces of dimension greater than `iDimension`.
                 mtxCompletionFaces = mtxCompletionFaces(sum(mtxCompletionFaces, 2) <= iDimension + 1, :);
                 mtxSkeletonFaces = mtxSkeletonFaces(sum(mtxSkeletonFaces, 2) <= iDimension + 1, :);
                 
@@ -466,6 +457,32 @@ classdef SimplicialComplex < handle
             % not been generated already (since this process is expensive).
             if (this.FacesAreGenerated)
                 this.GetFaces().RemoveEltsContaining(objFaces);
+            end
+        end
+        
+        function display(this, iNumToDisplay)
+            if nargin < 2
+                iNumToDisplay = 20;
+            end
+            
+            disp(' ');
+            disp([inputname(1),' = ']);
+            disp(' ');
+            
+            disp(['   `SimiplicialComplex` object on ' num2str(NumVerts(this)) ...
+                  ' vertices with generating set...']);
+            
+            for i = 1 : min(iNumToDisplay, Size(this.Generators))
+                disp(['      ' num2str(find(this.Generators.Sets(i, :)))]);
+            end
+            
+            disp(' ');
+            
+            if iNumToDisplay < Size(this.Generators)
+                disp(['   ...displaying ' num2str(iNumToDisplay) ' of ' ...
+                      num2str(Size(this)) ' generators.']);
+                
+                disp(' ');
             end
         end
     end

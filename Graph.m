@@ -85,15 +85,28 @@ classdef Graph
             
             % This method is not ideal and requires that we do twice the work as what
             % should be required.  Fix it if you have a better algorithm.  The problem
-            % is that Cliquer is limited to returning a maximum number of cliques but
+            % is that Cliquer is limited to returning a predetermined maximum number of cliques but
             % we don't have a nice upper bound on the number of cliques (2^n is not
             % nice).
-            % IDEA: Set the fifth parameter of `Cliquer.FindCliques` to the maximum
+            % IDEA: Set the fifth parameter of `Cliquer.FindAll` to the maximum
             % size of an integer on this platform; this should really probabaly be
-            % handled in the MEX file for `Cliquer.FindCliques`.
-            iNumCliques = this.CountCliques(iMin, iMax, bMaximal);
+            % handled in the MEX file for `Cliquer.FindAll`.
             
-            [~, mtxCliques] = Cliquer.FindCliques(this.ToMatrix(), iMin, iMax, bMaximal, iNumCliques);
+            if nargin < 4 || isempty(bMaximal)
+                bMaximal = false;
+            end
+            
+            if nargin < 3 || isempty(iMax)
+                iMax = 0; % no limit on clique size
+            end
+            
+            if nargin < 2 || isempty(iMin)
+                iMin = 1;
+            end
+            
+            iNumCliques = CountCliques(this, iMin, iMax, bMaximal);
+            
+            [~, mtxCliques] = Cliquer.FindAll(ToMatrix(this), iMin, iMax, bMaximal, iNumCliques);
             
             cllnCliques = Collection(mtxCliques);
         end
@@ -116,9 +129,21 @@ classdef Graph
             %       should be counted and `false` if all cliques are to be counted.
             %--------------------------------------------------------------------------
             
+            if nargin < 4 || isempty(bMaximal)
+                bMaximal = false;
+            end;
+            
+            if nargin < 3 || isempty(iMax)
+                iMax = 0; % no limit on clique size
+            end;
+            
+            if nargin < 2 || isempty(iMin)
+                iMin = 1;
+            end;
+            
             iMaxNumCliques = 0;
             
-            iNum = Cliquer.FindCliques(this.ToMatrix(), iMin, iMax, bMaximal, iMaxNumCliques);
+            iNum = Cliquer.FindAll(ToMatrix(this), iMin, iMax, bMaximal, iMaxNumCliques);
         end
         
         function gphComp = Complement(this)
@@ -129,7 +154,7 @@ classdef Graph
             %    Return the complement of the calling graph.
             %--------------------------------------------------------------------------
             
-            mtxAdj = this.ToMatrix();
+            mtxAdj = ToMatrix(this);
             mtxAdj = 1 - mtxAdj;
             mtxAdj(1 : n+1 : n^2) = 0;
             

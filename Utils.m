@@ -1,14 +1,6 @@
 classdef Utils
     % Description:
     %    A class containing utility functions as static methods.
-    methods (Access = public)
-        function obj = Utils()
-        end
-        
-        function nop(this)
-        end
-    end
-    
     methods (Static)
         function mtxSubsets = SubsetsOf(vecIn)
             assert(isrow(vecIn));
@@ -22,6 +14,16 @@ classdef Utils
         end
         
         function mtx = BinaryVectors(iLength)
+            %------------------------------------------------------------
+            % Usage:
+            %    mtx = BinaryVectors(iLength)
+            % Description:
+            %    Returns a matrix whose rows are the binary vectors of
+            %    the given length.
+            % Arguments:
+            %    iLength
+            %       The length of the vectors to be computed.
+            %------------------------------------------------------------
             assert(isscalar(iLength), 'Input must be a scalar.');
             assert(floor(iLength) == iLength, 'Input must be integer-valued');
             
@@ -33,9 +35,6 @@ classdef Utils
                 mtx = [zeros(2^(iLength - 1), 1), mtxSmaller; ...
                        ones(2^(iLength - 1), 1), mtxSmaller];
             end
-        end
-        
-        function nop_static()
         end
         
         % function mtxBinaryVects = BinaryVectors(iLength, r)
@@ -113,28 +112,37 @@ classdef Utils
             end
         end
         
-        function mtxSubsets = SubsetsToMatrix(celSubsets)
+        function mtxSubsets = SubsetsToMatrix(cellSubsets, iSetSize)
             %------------------------------------------------------------
             % Usage:
-            %    celSubsets = Utils.SubsetsToMatrix(celSubsets)
+            %    mtxSubsets = Utils.SubsetsToMatrix(cellSubsets, iSetSize)
             % Description:
-            %    Returns a 0/1-matrix representation of the given subsets.
+            %    Returns a matrix whose rows are indicator vectors for
+            %    the subsets in the given cell array.
             % Arguments:
-            %    celSubsets
+            %    cellSubsets
             %       A cell array whose entries are row vectors (sets).  The maximum
             %       number among entries determines the number of columns of the
             %       returned matrix.
+            %    iSetSize
+            %       The size of the
             % Note:
             %    No checking is done to make sure that the subsets are unique.
             %------------------------------------------------------------
             
-            iNumSubsets = size(celSubsets, 1);
-            iMax = max([celSubsets{:}]);
+            iNumSubsets = size(cellSubsets, 1);
+            iMax = max([cellSubsets{:}]);
             
-            mtxSubsets = zeros(iNumSubsets, iMax);
+            if nargin < 2
+                iSetSize = iMax;
+            end
+            
+            assert(iMax <= iSetSize);
+            
+            mtxSubsets = zeros(iNumSubsets, iSetSize);
             
             for ii = (1 : iNumSubsets)
-                mtxSubsets(ii, celSubsets{ii}) = 1;
+                mtxSubsets(ii, cellSubsets{ii}) = 1;
             end
         end
         

@@ -24,6 +24,10 @@ classdef Code < handle
             obj.SetDistribution(cvDistribution);
         end
         
+        function cpx = CodeComplex(this)
+            cpx = SimplicialComplex(this.Words);
+        end
+        
         function cllnDecoded = Decode(this, clln)
             % We should maybe use the input parser here for different methods.
             
@@ -125,6 +129,10 @@ classdef Code < handle
         
         function s = Sparsity(this)
             s = nnz(this.Words.ToMatrix()) / (this.Words.Size * this.Words.Dimension);
+        end
+        
+        function mtx = ToMatrix(this)
+            mtx = ToMatrix(this.Words);
         end
     end
     
