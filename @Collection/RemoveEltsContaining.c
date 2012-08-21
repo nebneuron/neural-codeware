@@ -14,18 +14,18 @@ void CheckArguments(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
     /* Ensure that an appropriate number of arguments were provided and that an
      * an appropriate number of return variables were requested. */
-    if (nrhs != 2)
-        mexErrMsgTxt("Exactly two input arguments are required.");
-    else if (nlhs > 1)
-        mexErrMsgTxt("Too many output arguments were requested.");
+    /* if (nrhs != 2) */
+    /*     mexErrMsgTxt("Exactly two input arguments are required."); */
+    /* else if (nlhs > 1) */
+    /*     mexErrMsgTxt("Too many output arguments were requested."); */
     
-    /* Perform size- and type-checking on the input values. */
-    if (!mxIsNumeric(prhs[0]) || mxIsComplex(prhs[0]))
-        mexErrMsgTxt("The first argument must be a real-valued matrix.");
-    else if (!mxIsNumeric(prhs[1]) || mxIsComplex(prhs[1]))
-        mexErrMsgTxt("The second argument must be a real-valued matrix.");
-    else if (mxGetN(prhs[0]) != mxGetN(prhs[1]))
-        mexErrMsgTxt("Both arguments must have the same number of columns.");
+    /* /\* Perform size- and type-checking on the input values. *\/ */
+    /* if (!mxIsNumeric(prhs[0]) || mxIsComplex(prhs[0])) */
+    /*     mexErrMsgTxt("The first argument must be a real-valued matrix."); */
+    /* else if (!mxIsNumeric(prhs[1]) || mxIsComplex(prhs[1])) */
+    /*     mexErrMsgTxt("The second argument must be a real-valued matrix."); */
+    /* else if (mxGetN(prhs[0]) != mxGetN(prhs[1])) */
+    /*     mexErrMsgTxt("Both arguments must have the same number of columns."); */
 }
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
@@ -36,14 +36,28 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     /* Miscellaneous variable declarations. */
     mwIndex i, j, k, idx;
     
-    /* Retrieve the first argument and get its size. */
-    const mxArray* ptrFaceMatrix = prhs[0];
+    /* Retrieve the calling object and the collection of empty faces. */
+    const mxArray* ptrThis = prhs[0];
+    const mxArray* ptrClln = prhs[1];
+    
+    /* Get the (sparse) matrix representation of this object. */
+    mxArray* ptrSparseFaceMatrix;
+    mexCallMATLAB(1, ptrSparseFaceMatrix, 1, ptrThis, "ToMatrix");
+    
+    /* Get the first matrix and its size. */
+    const mxArray* ptrFaceMatrix = ;
+    mexCallMATLAB(1, ptrFaceMatrix, 1, ptrSparseFaceMatrix, "full");
     double* ptrFaceMatrixData = mxGetPr(ptrFaceMatrix);
     mwSize iNumFaces = mxGetM(ptrFaceMatrix);
     mwSize iCols = mxGetN(ptrFaceMatrix);
     
+    /* Get the (sparse) matrix representation of the second collection object. */
+    mxArray* ptrSparseEmptyFaceMatrix;
+    mexCallMATLAB(1, ptrSparseEmptyFaceMatrix, 1, ptrClln, "ToMatrix");
+    
     /* Retrieve the second argument and get its number of rows. */
-    const mxArray* ptrEmptyFaceMatrix = prhs[1];
+    const mxArray* ptrEmptyFaceMatrix;
+    mexCallMATLAB(1, ptrEmptyFaceMatrix, 1, ptrSparseEmptyFaceMatrix, "full");
     double* ptrEmptyFaceMatrixData = mxGetPr(ptrEmptyFaceMatrix);
     mwSize iNumEmptyFaces = mxGetM(ptrEmptyFaceMatrix);
     
