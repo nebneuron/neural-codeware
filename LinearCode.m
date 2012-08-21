@@ -1,17 +1,19 @@
 classdef LinearCode < Code
     properties (Access = protected)
         GeneratorMatrix
-        Words
     end
     
     methods (Access = public)
         function obj = LinearCode(mtxGenerator)
             obj.GeneratorMatrix = mtxGenerator;
+            
+            cllnWords = LinearCode.GenerateWords(mtxGenerator);
+            obj = obj@Code(cllnWords);
         end
     end
     
     methods (Access = protected)
-        function GenerateWords(this)
+        function cllnWords = GenerateWords(this)
             % Get the rank of the matrix (which is the number of rows because we're
             % assuming that it is of full rank).  We would check that the given matrix
             % is of full rank using Matlab's 'rank' command, but this won't work because
@@ -35,15 +37,15 @@ classdef LinearCode < Code
                 end
             end
             
-            this.Words = Collection(mtxWords);
+            cllnWords = Collection(mtxWords);
         end
     end
     
     methods (Static)
-        function obj = Golay()
+        function mtxGen = GolayMatrix()
             % This creates one of the Golay codes.  Which one?  I think that it's the
             % extended one (aren't the two Golay codes of length 23 and 24), but that
-            % should be verified.  If so, I think the other can be gotten by puncturing
+            % should be checked.  If so, I think the other can be gotten by puncturing
             % this code on some (any?) column.
             v = [1 1 0 1 1 1 0 0 0 1 0];
             
@@ -51,13 +53,11 @@ classdef LinearCode < Code
             % anti-diagonals, where 'c' and 'r' are the first column and last row,
             % respectively, of this matrix.
             A = hankel(v, v([11, 1:10]));
-            mtxGenerator = [eye(12), [0, ones(1, 11); ones(11, 1), A]];
+            mtxGen = [eye(12), [0, ones(1, 11); ones(11, 1), A]];
         end
         
-        function obj = Hamming(r)
-            if (r < 2)
-                error('Hamming: "r" must be an integer greater than 1.');
-            end
+        function mtxGen = HammingMatrix(r)
+            assert(r >= 2, 'Hamming: "r" must be an integer greater than 1.');
 
             % First, we want to create the parity check matrix for the Hamming code.
             % This solution is a bit of a kludge.  The 'dec2bin' function creates an
@@ -72,18 +72,10 @@ classdef LinearCode < Code
             % matrix from the parity check matrix, and create the generator matrix
             % using the above relation.  (Note that no negative sign is needed because
             % we are dealing with binary matrices.)
-            mtxGenerator = [eye(2^r - r - 1), setdiff(mtxParity', eye(r), 'rows')];
-            
-            obj = LinearCode(mtxGenerator);
+            mtxGen = [eye(2^r - r - 1), setdiff(mtxParity', eye(r), 'rows')];
         end
         
-        function obj = ReedMuller(m, r)
-            obj = LinearCode(LinearCode.RMGenMatrix(m, r));
-        end
-    end
-    
-    methods (Static, Access = private)
-        function mtxGen = RMGenMatrix(m, r)
+        function mtxGen = ReedMullerMatrix(m, r)
             assert(m < 1 || r < 0 || r > m, ...
                 '`m` and `r` must integers with `m >= 1` and `r` between 0 and `m`.');
             
