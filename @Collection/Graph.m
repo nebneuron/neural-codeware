@@ -5,7 +5,7 @@ function gphOut = Graph(this)
     % Description:
     %    Retrieve the "cofire" graph of this collection.
     %------------------------------------------------------------
-
+    
     mtx = ToMatrix(this);
     gphOut = Graph(mtx' * mtx > 0);
 end

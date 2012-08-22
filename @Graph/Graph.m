@@ -1,14 +1,15 @@
-classdef Graph
+classdef Graph < handle
     % Description:
     %    <None>
     % Properties:
     %    <None>
     % Methods:
     %    CliqueComplex
-    %    CountCliques
     %    Complement
+    %    CountCliques
     %    display
     %    GetCliques
+    %    HellyCompletion
     %    Plot
     %    Save
     %    Size

@@ -1,10 +1,10 @@
-function gphOut = Graph(this)
+function i = n(this)
     %------------------------------------------------------------
     % Usage:
-    %    gphOut = cpx.Graph()
+    %    i = clln.n()
     % Description:
-    %    Retrieve the underlying graph of this simplicial complex.
+    %    The size of the superset of this collection.
     %------------------------------------------------------------
     
-    gphOut = Graph(GetGenerators(this));
+    i = size(this.Sets, 2);
 end

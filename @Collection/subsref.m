@@ -1,7 +1,11 @@
 function varRet = subsref(this, S)
     switch S(1).type
-        case '.'
-            varRet = builtin('subsref', this, S);
+      case '.'
+            if nargout == 0
+                builtin('subsref', this, S);
+            else
+                varRet = builtin('subsref', this, S);
+            end
         case '()'
             if (length(S(1)) < 2)
                 if (length(S(1).subs) ~= 1)

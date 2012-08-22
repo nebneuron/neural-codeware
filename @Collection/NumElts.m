@@ -1,11 +1,10 @@
-function iSize = Size(this)
+function iNum = NumElts(this)
     %-----------------------------------------------------------------------
     % Usage:
-    %    iSize = Size(this)
+    %    iNum = NumElts(this)
     % Description:
-    %    Return the number of elements in this set.  Same as method
-    %    `NumEtls`.
+    %    Return the number of elements in this set.  Same as method `Size`.
     %-----------------------------------------------------------------------
     
-    iSize = size(this.Sets, 1);
+    iNum = size(this.Sets, 1);
 end

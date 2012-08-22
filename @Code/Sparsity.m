@@ -1,3 +1,3 @@
 function s = Sparsity(this)
-    s = nnz(this.Words.ToMatrix()) / (this.Words.Size * this.Words.Dimension);
+    s = nnz(ToMatrix(this)) / (Size(this) * Length(this));
 end

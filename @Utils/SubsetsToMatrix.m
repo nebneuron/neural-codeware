@@ -11,7 +11,8 @@ function mtxSubsets = SubsetsToMatrix(cellSubsets, iSetSize)
     %       number among entries determines the number of columns of the
     %       returned matrix.
     %    iSetSize
-    %       The size of the
+    %       The size of the superset of these subsets (or the total
+    %       number of neurons).
     % Note:
     %    No checking is done to make sure that the subsets are unique.
     %------------------------------------------------------------

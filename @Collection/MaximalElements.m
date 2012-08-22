@@ -9,7 +9,7 @@ function cllnMaximal = MaximalElements(this)
 
     % This needs to be made sippier and more memory efficient for, for
     % instance, the case that we are finding the maximal elements of a full
-    % SimplicialComplex.  Use this comment for ideas.
+    % simplicial complex.  Use this comment for ideas.
     % 
     % The elements of maximum size are always maximal.  We can identify those
     % elements at low cost and then continue a search on the remaining
@@ -28,8 +28,8 @@ function cllnMaximal = MaximalElements(this)
 
     % Initialize the matrix of sets remaining to be searched to be the entire
     % list of sets.  Initilize the matrix of maximal elements to be empty.
-    mtxRemaining = this.ToMatrix();
-    mtxMaximal = zeros(0, this.Dimension);
+    mtxRemaining = ToMatrix(this);
+    mtxMaximal = zeros(0, n(this));
 
     while (~isempty(mtxRemaining))
         % Find the maximum sets among those remaining.
