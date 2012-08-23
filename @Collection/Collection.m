@@ -2,7 +2,7 @@ classdef Collection < handle
     % Description:
     %    A class for storing a collection of subsets.
     % Properties:
-    %    Sets
+    %    <None>
     % Methods:
     %    Append
     %    display
