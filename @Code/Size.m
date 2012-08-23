@@ -1,3 +1,3 @@
 function iSize = Size(this)
-    iSize = this.Words.Size;
+    iSize = Size(this.Words);
 end

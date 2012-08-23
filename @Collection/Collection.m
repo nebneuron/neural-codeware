@@ -5,58 +5,99 @@ classdef Collection < handle
     %    Sets
     % Methods:
     %    Append
-    %    Copy
-    %    Dimension
     %    display
+    %    ElementsOfSizes
     %    Graph
     %    MaximalElements
+    %    n
+    %    NumElts
+    %    RemoveElts
+    %    RemoveEltsContainedIn
     %    RemoveEltsContaining
+    %    SimplicialComplex
     %    Size
     %    subsref
     %    ToMatrix
     %    ToSubsets
+        
+    % Things not implemented: HellyCompletion, SetWeights, GetWeights
     
     properties (GetAccess = public, SetAccess = protected)
         Sets
     end
     
     methods (Access = public)
-        function this = Collection(mtxSet)
-            %--------------------------------------------------------------------------------
+        function this = Collection(sets, n)
+            %---------------------------------------------------------------
             % Usage:
-            %    obj = Collection(mtxSet)
+            %    clln = Collection(mtxSet)
+            %    clln = Collection(cellSets, n)
             % Description:
-            %    Constructs a `Collection` object.
+            %    Constructs an object that contains subsets of some
+            %    superset of the form {1, ..., n}.
             % Arguments:
             %    mtxSet
-            %       A nonempty matrix whose columns correspond to vertices and whose
-            %       rows correspond to subsets of columns.  If entry (i, j) is nonzero,
-            %       then set i contains vertex j; that is, each row is the indicator
-            %       vector of some set.
-            %       NOTE: No checking is done to ensure that the rows of the input
-            %       matrix are unique; hence, the resulting object is allowed to
-            %       contain duplicate sets.  However, all-zero rows are removed.
-            %--------------------------------------------------------------------------------
-
-            % this.Sets = spones(mtxSet(any(mtxSet, 2), :));
-            this.Sets = spones(mtxSet);
+            %       A matrix whose rows are indicator vectors of sets.  If
+            %       entry (i, j) is nonzero, then set i contains vertex j.
+            %    cellSets
+            %       A 1-dimensional cell array with each entry being a vector
+            %       containing a subset of some superset.
+            %    n
+            %       The size of the superset of the elements of this collection.
+            % Note:
+            %    No checking is done to ensure that specified elements are distinct;
+            %    hence, the resulting object is allowed to contain duplicate
+            %    sets.
+            %---------------------------------------------------------------
+            
+            assert(nargin <= 2, ...
+                   'At most 2 input arguments are accepted.');
+            
+            if nargin == 1
+                assert(ismatrix(sets));
+                assert(isnumeric(sets) || islogical(sets));
+                
+                % this.Sets = spones(sets(any(mtxSet, 2), :));
+                this.Sets = spones(sets);
+            else
+                assert(isa(sets, 'cell'), ...
+                       ['When two arguements are provided, the first must ' ...
+                        'be a cell array.']);
+                assert(isvector(sets));
+                
+                this.Sets = sparse(length(sets), n);
+                
+                for i = 1 : length(sets)
+                    this.Sets(i, sets{i}) = 1;
+                end
+            end
         end
     end
     
     methods (Access = public)
-        varDummy = Append(this, cllnNew)
+        Append(this, cllnNew)
         
         objCopy = Copy(this)
         
-        iDim = Dimension(this)
-        
         display(this, iNumToDisplay)
+        
+        cllnOut = ElementsOfSizes(this, vectSizes)
         
         gphOut = Graph(this)
         
+        i = n(this)
+        
         objMaximal = MaximalElements(this)
         
-        varDummy = RemoveEltsContaining(this, cllnSets)
+        iNum = NumElts(this)
+        
+        RemoveElts(this, cllnSets)
+        
+        RemoveEltsContainedIn(this, cllnSets)
+        
+        RemoveEltsContaining(this, cllnSets)
+        
+        cllnComplex = SimplicialComplex(this)
         
         iSize = Size(this)
         
