@@ -26,7 +26,6 @@ classdef Code < handle
     %    RandomConstantWeight
     %    ShiftCode
     
-    
     properties (GetAccess = public, SetAccess = protected)
         Words
         Metric
