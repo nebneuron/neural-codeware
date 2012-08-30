@@ -1,4 +1,16 @@
 function SetDistribution(this, cvDistribution)
+    %---------------------------------------------------------------------------
+    % Usage:
+    %    this.SetDistribution(cvDistribution)
+    % Description:
+    %    Set the internal distribution of the codewords of this code.
+    % Arguments:
+    %    cvDistribution
+    %        A column vector containing a distribution.  The entries in this
+    %        vector must be positive and will be rescaled so that they sum to
+    %        one.
+    %---------------------------------------------------------------------------
+    
     % More checking could be done here.  For instance, the current
     % checking allows for `NaN` and `Inf` values that will cause errors.
     assert(isa(cvDistribution, 'numeric'), ...
