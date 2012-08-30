@@ -26,7 +26,6 @@ classdef Code < handle
     %    RandomConstantWeight
     %    ShiftCode
     
-    
     properties (GetAccess = public, SetAccess = protected)
         Words
         Metric
@@ -37,24 +36,45 @@ classdef Code < handle
     end
     
     methods (Access = public)
-        function obj = Code(words, cvDistribution)
+        function this = Code(words, cvDistribution)
+            %---------------------------------------------------------------
+            % Usage:
+            %    code = Code(words, cvDistribution)
+            % Description:
+            %    Create a code binary code.
+            % Arguments:
+            %    mtxSets
+            %       A matrix whose rows are indicator vectors of sets.  If
+            %       entry (i, j) is nonzero, then set i contains vertex j.
+            %    cellSets
+            %       A 1-dimensional cell array with each entry being a vector
+            %       containing a subset of some superset.
+            %    n
+            %       The size of the superset of the elements of this collection.
+            % Note:
+            %    No checking is done to ensure that specified elements are distinct;
+            %    hence, the resulting object is allowed to contain duplicate
+            %    sets.
+            %---------------------------------------------------------------
+            
             if isa(words, 'Collection')
-                obj.Words = words.Copy();
+                mtxWords = unique(ToMatrix(words), 'rows');
+                this.Words = Collection(mtxWords);
             else
-                obj.Words = Collection(words);
+                this.Words = Collection(words);
             end
             
             if nargin < 2
-                cvDistribution = ones(obj.Words.Size(), 1);
+                cvDistribution = ones(Size(this), 1);
             end
             
-            obj.Metric = Code.HammingDist;
-            obj.SetDistribution(cvDistribution);
+            this.Metric = Code.HammingDist;
+            this.SetDistribution(cvDistribution);
         end
     end
     
     methods (Access = public)
-        cpx = CodeComplex(this)
+        clln = CodeComplex(this)
         
         cllnDecoded = Decode(this, clln)
         

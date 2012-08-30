@@ -1,5 +1,17 @@
 function gph = CodewordGraph(this, tol)
-    mtxWords = this.Words.ToMatrix();
+    %---------------------------------------------------------------------------
+    % Usage:
+    %    gph = this.CodewordGraph(tol)
+    % Description:
+    %    Create a graph whose vertices correspond to the words of this code.
+    %    Vertices are joined by an edge when the corresponding codewords are
+    %    at most the given Hamming distace apart.
+    % Arguments:
+    %    tol (default: 1)
+    %        The Hamming distance tolerance
+    %---------------------------------------------------------------------------
+    
+    mtxWords = ToMatrix(this.Words);
 
     if nargin < 2
         tol = 1;
