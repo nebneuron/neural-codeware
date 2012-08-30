@@ -1,4 +1,12 @@
 function FindWeights(this)
+    %---------------------------------------------------------------------------
+    % Usage:
+    %    this.FindWeights()
+    % Description:
+    %    Compute and store (internally) the weights associated to the words
+    %    in the stream complex.
+    %---------------------------------------------------------------------------
+    
     this.Complex = ...
         CodeComplex(this.Codes{StreamLength(this)});
 
