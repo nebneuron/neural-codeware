@@ -2,7 +2,7 @@ classdef Collection < handle
     % Description:
     %    A class for storing a collection of subsets.
     % Properties:
-    %    Sets
+    %    <None>
     % Methods:
     %    Append
     %    display
@@ -22,7 +22,7 @@ classdef Collection < handle
         
     % Things not implemented: HellyCompletion, SetWeights, GetWeights
     
-    properties (GetAccess = public, SetAccess = protected)
+    properties (Access = protected)
         Sets
     end
     
@@ -45,9 +45,8 @@ classdef Collection < handle
             %    n
             %       The size of the superset of the elements of this collection.
             % Note:
-            %    No checking is done to ensure that specified elements are distinct;
-            %    hence, the resulting object is allowed to contain duplicate
-            %    sets.
+            %    No checking is done to ensure that specified elements are
+            %    distinct.
             %---------------------------------------------------------------
             
             assert(nargin <= 2, ...

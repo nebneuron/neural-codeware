@@ -1,4 +1,14 @@
 function Append(this, codeNew)
+    %---------------------------------------------------------------------------
+    % Usage:
+    %    this.Append(codeNew)
+    % Description:
+    %    Append a code to the calling stream.
+    % Arguments:
+    %    codeNew
+    %        The code to append to the callind stream.
+    %---------------------------------------------------------------------------
+    
     assert(isa(codeNew, 'Code'), ...
            ['Attempted to add a non-`Code` object to a' ...
             ' `Codestream`.']);
