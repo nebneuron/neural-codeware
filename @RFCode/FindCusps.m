@@ -1,4 +1,7 @@
-function [mtxCuspOne, mtxCuspTwo] = FindCusps(mtxCenters, cvRadii, cvCenters1, cvCenters2)
+function [mtxCuspOne, mtxCuspTwo] = FindCusps(mtxCenters, cvRadii, cvCenters1, cvCenters2)    
+    % This is a utility function used in creating the collection of
+    % codewords in a `RFCode`.
+    
     % We have lists of points `P` and `Q` along with lists of radii `Rp`
     % and `Rq`.
     P = mtxCenters(cvCenters1, :);

@@ -1,4 +1,7 @@
 function cllnTriangles = EmptyTriangles(clln, mtxCenters, cvRadii)
+    % This is a utility function used in creating the collection of
+    % codewords in a `RFCode`.
+    
     mtxClln = clln.ToMatrix();
     cvLogicalTriangleIdxs = (sum(mtxClln, 2) == 3);
     cvTriangleIdxs = find(cvLogicalTriangleIdxs);

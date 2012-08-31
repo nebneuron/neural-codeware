@@ -1,4 +1,7 @@
 function cvBool = IsInTriangle(X, P, Q, R)
+    % This is a utility function used in creating the collection of
+    % codewords in a `RFCode`.
+    
     % I think that this basically compares slopes of lines.  I don't
     % know.  It's Vladimir's algorithm.  I'm sure that there's a better
     % way to do this (in terms of the code duplication, at least).
