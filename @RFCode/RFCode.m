@@ -2,7 +2,10 @@ classdef RFCode < Code
     % Description:
     %    Subclass of `Code` for creating codes based on overlapping receptive
     %    fields.
+    % Properties:
+    %    <None>
     % Methods:
+    %    <methods inherited from `Code`>
     %    GetCenters
     %    GetRadii
     %    PlotRF
