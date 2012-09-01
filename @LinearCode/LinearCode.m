@@ -17,10 +17,26 @@ classdef LinearCode < Code
     end
     
     methods (Access = public)
-        function obj = LinearCode(mtxGenerator)
-            cllnWords = LinearCode.GenerateWords(mtxGenerator);
-            obj = obj@Code(cllnWords);
-            obj.GeneratorMatrix = mtxGenerator;
+        function code = LinearCode(mtxGenerator, bIsFullRank)
+            %---------------------------------------------------------------------------
+            % Usage:
+            %    code = LinearCode(mtxGenerator)
+            % Description:
+            %    Construct a binary code from the provided generator matrix.
+            % Arguments:
+            %    mtxGenerator
+            %       The generator matrix of this code; the resultant code is the row
+            %       span of this matrix.
+            %    bIsFullRank (default: `false`)
+            %       If this is `true`, then the generator matrix is assumed to be
+            %       full-rank and no checking is done to ensure that all codewords
+            %       are distinct; if it is `false`, all resultant codewords are
+            %       guaranteed to be distinct. 
+            %---------------------------------------------------------------------------
+            
+            cllnWords = LinearCode.GenerateWords(mtxGenerator, bIsFullRank);
+            code = code@Code(cllnWords);
+            code.GeneratorMatrix = mtxGenerator;
         end
     end
     
