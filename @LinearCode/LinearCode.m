@@ -34,9 +34,13 @@ classdef LinearCode < Code
             %       guaranteed to be distinct. 
             %---------------------------------------------------------------------------
             
+            if nargin < 2
+                bIsFullRank = false;
+            end
+            
             cllnWords = LinearCode.GenerateWords(mtxGenerator, bIsFullRank);
             code = code@Code(cllnWords);
-            code.GeneratorMatrix = mtxGenerator;
+            code.GenMtx = mtxGenerator;
         end
     end
     
@@ -45,7 +49,7 @@ classdef LinearCode < Code
     end
     
     methods (Static, Access = public)
-        cllnWords = GenerateWords(mtxGenerator)
+        cllnWords = GenerateWords(mtxGenerator, bIsFullRank)
         
         mtxGen = GolayMatrix()
         
