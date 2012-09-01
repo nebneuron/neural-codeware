@@ -7,6 +7,7 @@ classdef Collection < handle
     %    Append
     %    display
     %    ElementsOfSizes
+    %    GetWeights
     %    Graph
     %    MaximalElements
     %    n
@@ -15,6 +16,7 @@ classdef Collection < handle
     %    RemoveEltsContainedIn
     %    RemoveEltsContaining
     %    SimplicialComplex
+    %    SetWeights
     %    Size
     %    subsref
     %    ToMatrix
@@ -24,6 +26,7 @@ classdef Collection < handle
     
     properties (Access = protected)
         Sets
+        Weights
     end
     
     methods (Access = public)
@@ -70,6 +73,8 @@ classdef Collection < handle
                     this.Sets(i, sets{i}) = 1;
                 end
             end
+            
+            SetWeights(this, ones(NumElts(this), 1));
         end
     end
     
@@ -81,6 +86,8 @@ classdef Collection < handle
         display(this, iNumToDisplay)
         
         cllnOut = ElementsOfSizes(this, vectSizes)
+        
+        cvWeights = GetWeights(this)
         
         gphOut = Graph(this)
         
@@ -95,6 +102,8 @@ classdef Collection < handle
         RemoveEltsContainedIn(this, cllnSets)
         
         RemoveEltsContaining(this, cllnSets)
+        
+        SetWeights(this, cvWeights)
         
         cllnComplex = SimplicialComplex(this)
         
