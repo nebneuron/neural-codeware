@@ -74,7 +74,7 @@ classdef Code < handle
     end
     
     methods (Access = public)
-        cpx = CodeComplex(this)
+        clln = CodeComplex(this)
         
         cllnDecoded = Decode(this, clln)
         

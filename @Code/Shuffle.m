@@ -1,4 +1,12 @@
 function codeNew = Shuffle(this)
+    %---------------------------------------------------------------------------
+    % Usage:
+    %    codeNew = this.Shuffle()
+    % Description:
+    %    Create a shuffled version of the calling code; that is, create a
+    %    code with the same weight distribution as the calling code.
+    %---------------------------------------------------------------------------
+    
     mtxOld = ToMatrix(this);
     
     iSize = Size(this);

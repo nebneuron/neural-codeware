@@ -1,10 +1,10 @@
-function iSize = Size(this)
+function mtxGen = GeneratorMatrix(this)
     %---------------------------------------------------------------------------
     % Usage:
-    %    iSize = this.Size()
+    %    mtxGen = this.GeneratorMatrix()
     % Description:
-    %    Return the number of codewords in this code.
+    %    Return the matrix used to generate the calling `LinearCode` object.
     %---------------------------------------------------------------------------
     
-    iSize = Size(this.Words);
+    mtxGen = this.GenMtx;
 end
