@@ -24,5 +24,5 @@ function SetDistribution(this, cvDistribution)
            ['The input distribution must contain only nonnegative ' ...
             'values and at least one positive value.']);
 
-    obj.Distribution = cvDistribution / sum(cvDistribution);
+    this.Distribution = cvDistribution / sum(cvDistribution);
 end
