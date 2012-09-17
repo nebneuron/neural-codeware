@@ -37,15 +37,13 @@ classdef RFCode < Code
             
             % Process the first argument.
             if isscalar(arg1)
-                % If the first argument is a scalar, create a random list of
-                % centers.
-                nCenters = arg1;
-                mtxCenters = rand(nCenters, 2);
+                iCenters = arg1;
+                % mtxCenters = rand(iCenters, 2);
             elseif ismatrix(arg1)
                 assert(size(arg1, 2) == 2, ...
                        'The provided matrix must have exactly two columns');
                 
-                nCenters = size(arg1, 1);
+                iCenters = size(arg1, 1);
                 mtxCenters = arg1;
             else
                 error(['The first argument must be a scalar or a matrix.  See ' ...
@@ -55,19 +53,26 @@ classdef RFCode < Code
             % Process the second argument.
             if isscalar(r)
                 assert(r > 0, 'The given radius must be positive.');
-                cvRadii = r * ones(nCenters, 1);
+                cvRadii = r * ones(iCenters, 1);
             elseif isvector(r)
-                assert(length(r) == nCenters, ...
+                assert(length(r) == iCenters, ...
                        ['The list of radii must be of the same length as ' ...
                         'the number of centers.']);
                 assert(min(r) > 0, ...
                        ['All of the given radii must be positive.']);
                 
                 % Store the radii as a column vector.
-                cvRadii = reshape(r, nCenters, 1);
+                cvRadii = reshape(r, iCenters, 1);
             else
                 error(['The secont argument must be a scalar or a vector.  See ' ...
                        '`help RFCode.RFCode` for more information.']);
+            end
+            
+            % If the first argument is a scalar, create a random list of
+            % centers.  This must be done after the second argument has been
+            % processed. 
+            if isscalar(arg1)
+                mtxCenters = RFCode.DropCenters(cvRadii);
             end
             
             % Generate the collection of words represented by this receptive
@@ -88,6 +93,10 @@ classdef RFCode < Code
         cllnRadii = GetRadii(this)
         
         PlotRF(this)
+    end
+    
+    methods (Static)
+        mtxCenters = DropCenters(cvRadii, iGridSize)
     end
     
     methods (Static, Access = protected)
